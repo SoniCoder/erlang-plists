@@ -713,17 +713,18 @@ cluster_runmany(_, Fuse, [], _Nodes, [], Results) ->
 % a new process
 cluster_runmany(Fun, Fuse, [Task|TaskList], [N|Nodes], Running, Results) ->
     Parent = self(),
-    case Task of
-	{Num, L2} ->
-	    Fun2 = fun () ->
-			   Parent ! {self(), Num, Fun(L2)}
-		   end;
-	{fuse, R1, R2} ->
-	    {recursive, FuseFunc} = Fuse,
-	    Fun2 = fun () ->
-			   Parent ! {self(), fuse, FuseFunc(R1, R2)}
-		   end
-    end,
+    Fun2 =
+        case Task of
+            {Num, L2} ->
+                fun () ->
+            		Parent ! {self(), Num, Fun(L2)}
+            	end;
+            {fuse, R1, R2} ->
+                {recursive, FuseFunc} = Fuse,
+                fun () ->
+            		Parent ! {self(), fuse, FuseFunc(R1, R2)}
+            	end
+        end,
     Fun3 = fun () ->
 		   try Fun2()
 		   catch
