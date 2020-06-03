@@ -750,7 +750,7 @@ cluster_runmany(Fun, Fuse, TaskList, Nodes, Running, Results) when length(Runnin
 				    end,
 				    Running),
 	    handle_error(junkvalue, Reason, RunningPids);
-	{Pid, Num, Result} ->
+	{Pid, Num, Result} when is_pid(Pid) ->
 	    % throw out the exit message, Reason should be
 	    % normal, noproc, or noconnection
 	    receive {'DOWN', _, _, Pid, _Reason} ->
